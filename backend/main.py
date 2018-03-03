@@ -1,5 +1,4 @@
 from flask import Flask, request
-from resources.database import hello
 from resources.download import VideoDownloader
 import os
 import requests
