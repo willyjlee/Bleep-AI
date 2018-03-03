@@ -6,4 +6,5 @@ def hello_world():
   return "Bitch this shit workin"
 
 if __name__ == '__main__':
-  app.run()
+  app.run(host='0.0.0.0')
+
