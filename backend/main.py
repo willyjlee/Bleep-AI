@@ -1,10 +1,13 @@
 from flask import Flask, request
 from resources.download import VideoDownloader
+from resources.parse import Parser
 import os
+import json
 import requests
 
 app = Flask(__name__)
 download_handler = VideoDownloader()
+parser = Parser()
 
 headers = {
     # Request headers
@@ -30,7 +33,11 @@ def download():
   youtube_path = request.args.get('path')
   print(youtube_path)
   download_handler.download('https://www.youtube.com/' + youtube_path)
-  return "Installed that shit"
+  return "installed that shit"
+
+@app.route('/path')
+def path():
+  return json.dumps(parser.parse())
 
 def get_root_path(internal_path=""):
     return os.path.join(app.root_path, internal_path)
