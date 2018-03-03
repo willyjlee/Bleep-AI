@@ -13,12 +13,12 @@ headers = {
 params = urllib.parse.urlencode({
     # Request parameters
     #'videoUrl': '{string}',
-    'language': 'English',
+    #'language': 'English',
     #'externalId': '{string}',
     #'metadata': '{string}',
     # 'description': '{string}',
     # 'partition': '{string}',
-    # 'callbackUrl': '{string}',
+    'callbackUrl': '52.165.191.240:8080/callback?projectName=yo',
     # 'indexingPreset': '{string}',
     # 'streamingPreset': '{string}',
     # 'linguisticModelId': '{string}'
@@ -37,10 +37,6 @@ try:
     with open('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4', 'rb') as f:
         files = {'video.mp4': f}
         bid = requests.post(url, files=files, headers=headers).json()
-    
-    url_break = "https://videobreakdown.azure-api.net/Breakdowns/Api/Partner/Breakdowns/%s" % bid
-    breakds = requests.get(url_break, headers=headers)
-    print(breakds.text)
 
 except Exception as e:
     print("[Errno {0}] {1}".format(e.errno, e.strerror))
