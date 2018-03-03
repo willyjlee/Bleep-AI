@@ -1,21 +1,124 @@
 <!doctype html>
-<script src="https://www.youtube.com/iframe_api"></script>
-<script>
-	console.log('YT', YT)
-</script>
-<style type="text/css">
-	#mainPopup {
-		padding: 10px;
-		height: 200px;
-		width: 400px;
-		font-family: Helvetica, Ubuntu, Arial, sans-serif;
-	}
-	h1 {
-		font-size: 2em;
-	}
-</style>
+<html>
+  <body>
+    <style type="text/css">
+      div {
+        display: flex;
+        flex-direction: column;
+      }
 
-<div id="mainPopup">
-<h1>Hello extensionizr!</h1>
-<p>To shut this popup down, edit the manifest file and remove the "default popup" key. To edit it, just edit ext/page_action/page_action.html. The CSS is there, too.</p>
-</div>
+      #main {
+        width: 16.5rem;
+        font-family: sans-serif;
+        --q: #262626;
+        --w: #4d4d4d;
+        --e: #737373;
+        --r: #999999;
+        --t: #bfbfbf;
+      }
+
+      h1, h2, h3, h4, h5, h6, p, textarea {
+        font-weight: 300;
+        margin: 0;
+        transition: all 0.25s;
+      }
+
+      h2 {
+        color: var(--w);
+        margin-bottom: 0.5rem;
+      }
+
+      #egg {
+        height: 2em;
+        opacity: 0;
+        transition: all 1s;
+        align-self: flex-end;
+        position: absolute;
+      }
+
+      #egg:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+
+      .row {
+        flex-direction: row;
+        margin-bottom: 0.5rem;
+        align-items: center;
+      }
+
+      #easter {
+        overflow: hidden;
+        opacity: 0;
+        height: 0;
+        transition: all 1s;
+      }
+
+      #easter>div:nth-child(2) {
+        align-items: flex-start;
+      }
+
+      h3, textarea {
+        font-size: 1.2rem;
+        color: var(--r);
+        outline: 0;
+      }
+
+      ::-webkit-input-placeholder {
+        color: var(--r);
+      }
+
+      textarea {
+        resize: none;
+        height: 5rem;
+        width: 14rem;
+        border: 1px solid var(--t);
+      }
+
+      input[type="radio"] {
+        display: none;
+      }
+
+      .radio {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        transition: all 0.25s;
+      }
+
+      .active .radio {
+        background-color: var(--w);
+      }
+
+      .active h3, .active #custom {
+        color: var(--w);
+      }
+
+      .content {
+        position: relative;
+        left: 0.5rem;
+      }
+    </style>
+    <div id="main">
+      <h2>Censor:</h2>
+      <div class="row">
+        <div class="radio"></div><h3 class="content">None</h3>
+      </div>
+      <div class="row">
+        <div class="radio"></div><h3 class="content">Bad Words</h3>
+      </div>
+      <div id="easter">
+        <div class="row">
+          <div class="radio"></div><h3 class="content">Good Words</h3>
+        </div>
+        <div class="row">
+          <div class="radio"></div><h3 class="content"></h3><textarea id="custom" class="content" placeholder="Custom"></textarea>
+        </div>
+      </div>
+      <img id="egg" src="egg.png" />
+    </div>
+    <script src="page_action.js"></script>
+  </body>
+</html>
