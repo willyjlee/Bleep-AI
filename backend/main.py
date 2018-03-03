@@ -16,7 +16,7 @@ headers = {
 def hello_world():
   return "Welcome Bitch"
 
-@app.route('/callback')
+@app.route('/callback', methods= ['POST'])
 def callback():
 	bid = request.args.get('id')
 	state = request.args.get('state')
