@@ -18,7 +18,7 @@ params = urllib.parse.urlencode({
     #'metadata': '{string}',
     # 'description': '{string}',
     # 'partition': '{string}',
-    'callbackUrl': '52.165.191.240:8080/callback?projectName=yo',
+    'callbackUrl': 'http://52.165.191.240:8080/callback?projectName=yo',
     # 'indexingPreset': '{string}',
     # 'streamingPreset': '{string}',
     # 'linguisticModelId': '{string}'
@@ -33,10 +33,13 @@ try:
     # print(data)
     # conn.close()
 
-    url = "https://videobreakdown.azure-api.net/Breakdowns/Api/Partner/Breakdowns?name=video.mp4&privacy=Public&%s" % params
-    with open('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4', 'rb') as f:
-        files = {'video.mp4': f}
-        bid = requests.post(url, files=files, headers=headers).json()
+	url = "https://videobreakdown.azure-api.net/Breakdowns/Api/Partner/Breakdowns?name=video.mp4&privacy=Public&%s" % params
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	print(dir_path)
+	with open(os.path.join(dir_path, 'video.mp4'), 'rb') as f:
+		files = {'video.mp4': f}
+		bid = requests.post(url, files=files, headers=headers)
+		print(bid.json())
 
 except Exception as e:
     print("[Errno {0}] {1}".format(e.errno, e.strerror))

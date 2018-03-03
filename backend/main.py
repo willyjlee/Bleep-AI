@@ -24,7 +24,7 @@ def callback():
 	url_break = "https://videobreakdown.azure-api.net/Breakdowns/Api/Partner/Breakdowns/%s" % bid
 	breakds = requests.get(url_break, headers=headers)
 	print(breakds.text)
-
+	return "ok..."
 
 @app.route('/download')
 def download():
