@@ -6,5 +6,5 @@ def hello_world():
   return "Bitch this shit workin"
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0')
+  app.run(host='0.0.0.0', port=8080)
 
