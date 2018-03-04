@@ -42,6 +42,8 @@ def download():
 
 @app.route('/path')
 def path():
+	video_id = request.args.get('id')
+  print(video_id)
   return jsonify(parser.parse())
 
 @app.route('/database')
