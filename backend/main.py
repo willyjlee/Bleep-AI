@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from resources.download import VideoDownloader
 from resources.parse import Parser
 from pymongo import MongoClient
@@ -42,7 +42,7 @@ def download():
 
 @app.route('/path')
 def path():
-  return json.dumps(parser.parse())
+  return jsonify(parser.parse())
 
 @app.route('/database')
 def database():
