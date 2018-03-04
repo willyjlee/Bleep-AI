@@ -89,7 +89,7 @@ def database():
     return str(results)
 
 @app.route('/fetch_entries')
-def database():
+def fetch_entries():
     return jsonify(db.fetch_entries(num_entries=5))
 
 def get_root_path(internal_path=""):
