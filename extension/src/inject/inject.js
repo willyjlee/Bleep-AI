@@ -1,5 +1,6 @@
-let transcript = fake.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
+let transcript;//fake.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
 let paused = false;
+let video, container;
 let previousTime = 0;
 let customText = [];
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -7,27 +8,55 @@ let lastData = {};
 
 let synth = new Tone.Oscillator({
 	frequency: 1000,
-	volume: -10
+	volume: -30
 }).toMaster();
 
 
 chrome.extension.sendMessage({}, response => {
-	// fetch(`https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}`)
-  // .then(res => res.json())
-  // .then(d => {
-  //   transcript = d.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
-  // })
-  // .catch(e => console.log('e', e));
+	let check = setInterval(() => {
+		video = document.getElementsByClassName('video-stream')[0];
+		if (video) {
+			video.pause();
+			clearInterval(check);
+		}
+	}, 100);
+
+	fetch(`https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}`)
+  .then(res => res.json())
+  .then(d => {
+    transcript = d.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
+		let gradient = document.createElement('div');
+
+		Object.assign(gradient.style,{
+			// position: 'relative',
+			display: 'flex',
+			bottom: '0',
+			justifySelf: 'flex-end',
+			height: '5px',
+			width: '100%',
+			backgroundColor: 'white',
+			backgroundImage: `linear-gradient(90deg, ${[...Array(50)].map((_, i) => `${interpolateColors([0,255,0], [255,0,0], Math.random())} ${~~(i / 49 * 100)}%`).join(', ')})`
+			// backgroundImage: 'linear-gradient(90deg, rgb(0, 0, 0) 0%, #6284FF 50%, #FF0000 100%)'
+		});
+
+		let check2 = setInterval(() => {
+			container = document.getElementById('player-container');
+			if (container) {
+				container.appendChild(gradient);
+				console.log('CONTAINER', container)
+				clearInterval(check2);
+			}
+		}, 100);
+		video.play();
+  })
+  .catch(e => console.log('e', e));
 
 	let readyStateCheckInterval = setInterval(() => {
-		let video = document.getElementsByClassName('video-stream')[0];
-		video && video.pause();
-		if (activeIndex !== 0 && document.readyState === "complete") {
+		if (activeIndex !== 0 && video && document.readyState === "complete") {
 			clearInterval(readyStateCheckInterval);
-			video.play();
 			setInterval(() => {
 				let { currentTime } = video;
-				if (!paused) {
+				if (transcript && !paused) {
 					let data = getWord(currentTime, transcript);
 					if (data && lastData != data) {
 						let { word, start, end } = data;
@@ -113,3 +142,10 @@ chrome.storage.sync.get('settings', ({ settings }) => {
 	activeIndex = Number(settings.activeIndex);
 	customText = settings.custom.split(', ');
 });
+
+function interpolateColors(color1, color2, progress) { // color is [r, g, b], progress is 0 - 1
+	let rDiff = color2[0] - color1[0];
+	let gDiff = color2[1] - color1[1];
+	let bDiff = color2[2] - color1[2];
+	return `rgb(${~~(color1[0] + rDiff * progress)}, ${~~(color1[1] + gDiff * progress)}, ${~~(color1[2] + bDiff * progress)})`;
+}
