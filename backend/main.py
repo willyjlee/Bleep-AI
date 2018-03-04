@@ -40,9 +40,9 @@ def callback():
 
 @app.route('/download')
 def download():
-    youtube_path = request.args.get('path')
-    print(youtube_path)
-    download_handler.download('https://www.youtube.com/' + youtube_path)
+    video_id = request.args.get('video_id')
+    print(video_id)
+    download_handler.download('https://www.youtube.com/watch?v=' + video_id)
     return "installed that shit"
 
 
