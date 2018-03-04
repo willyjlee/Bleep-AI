@@ -1,5 +1,4 @@
 import requests
-from parse import Parser
 
 subscription_key = '64d30c5b3fe84d2481a87ac96f1029c9'
 sentiment_api_url = 'https://westcentralus.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment'
