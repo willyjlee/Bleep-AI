@@ -19,11 +19,13 @@ headers = {
     'Ocp-Apim-Subscription-Key': '64edd068ee5140a7b6ce2c9790c4f7f2',
 }
 
+
 @app.route('/')
 def hello_world():
     return "Welcome Bitch"
 
-@app.route('/callback', methods= ['POST'])
+
+@app.route('/callback', methods=['POST'])
 def callback():
 	bid = request.args.get('id')
 	state = request.args.get('state')
@@ -33,18 +35,21 @@ def callback():
 	print(breakds.text)
 	return "ok..."
 
+
 @app.route('/download')
 def download():
-  youtube_path = request.args.get('path')
-  print(youtube_path)
-  download_handler.download('https://www.youtube.com/' + youtube_path)
-  return "installed that shit"
+    youtube_path = request.args.get('path')
+    print(youtube_path)
+    download_handler.download('https://www.youtube.com/' + youtube_path)
+    return "installed that shit"
+
 
 @app.route('/path')
 def path():
-	video_id = request.args.get('id')
-  print(video_id)
-  return jsonify(parser.parse())
+    video_id = request.args.get('id')
+    print(video_id)
+    return jsonify(parser.parse())
+
 
 @app.route('/database')
 def database():
