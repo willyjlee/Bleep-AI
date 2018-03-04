@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from resources.download import VideoDownloader
 from resources.parse import Parser
+from resources.database import DatabaseHandler
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
@@ -12,10 +13,9 @@ from resources.media_services import processVideo
 app = Flask(__name__)
 CORS(app)
 download_handler = VideoDownloader()
-parser = Parser()
 
 client = MongoClient('mongodb://hacktech-2018:pdUKdnxVEIgjTivMejwpXXDICiXCWokDZx0uuTasc0W5CHiApUtCQ227TZXESrgYXzO7h4BuMGjQM14frshPsw==@hacktech-2018.documents.azure.com:10255/?ssl=true&replicaSet=globaldb')
-db = client['HackTech2018'].VideoData
+db = DatabaseHandler(client['HackTech2018'].VideoData)
 
 headers = {
     # Request headers
