@@ -7,8 +7,7 @@ class Parser(object):
 
     # returns an array of dictionaries with info for each word
     def parse(self, directory="samples", file_name="test.info"):
-        caption_path = os.path.dirname(os.path.realpath(
-            __file__)) + "/../" + directory + "/" + file_name
+        caption_path = os.path.join(directory, file_name)
         print(caption_path)
         ret = []
         with open(caption_path) as f:
