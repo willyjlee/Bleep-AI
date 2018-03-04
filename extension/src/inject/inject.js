@@ -1,7 +1,8 @@
 let transcript;//fake.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
 let paused = false;
-let video, container;
+let video, container, title, name, link;
 let previousTime = 0;
+let activeIndex = null;
 let customText = [];
 let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let lastData = {};
@@ -11,51 +12,148 @@ let synth = new Tone.Oscillator({
 	volume: -30
 }).toMaster();
 
+window.onload = function() {
+	if (location.href.includes('watch')) {
+		return;
+	}
+
+	fetch('https://52.165.191.240:8080/fetch_entries')
+	.then(res => res.json())
+	.then(data => {
+		console.log('DATA', data)
+
+		var overallContainer = $("<div>", {
+	    id: "overallContainer"
+	  });
+	  overallContainer.css({
+	    display: "flex",
+	    "flex-direction": "column"
+	  });
+
+	  var thumbnailContainer = $("<div>", {
+	    id: "thumbnailContainer"
+	  });
+	  thumbnailContainer.css({
+	    display: "flex"
+	  });
+
+	  var titleContainer = $("<div>", {
+	    id: "titleContainer"
+	  });
+	  titleContainer.css({
+	    display: "flex",
+	    "margin-bottom": "20px",
+	    "margin-top": "10px"
+	  });
+
+	  var create_thumbnail = (video_id = "", title = "", author = "", author_link="google.com", rating=0) => {
+	    url =
+	      "https://i.ytimg.com/vi/" + video_id + "/hqdefault.jpg?sqp=-oaymwEZCNACELwBSFXyq4qpAwsIARUAAIhCGAFwAQ==&rs=AOn4CLDH4jTHLG0t3N64dLBsBfQncpS_Rw"
+	    text_style = (rating < 0.5)? "red": "green";
+	    prompt_text = (rating > 0.5)? "Safe": "Explicit";
+	    return `
+	  <div style="width: 210px; height: auto; margin-right: 4px; display: flex; flex-direction: column">
+	    <a href="http://youtube.com/watch?v=${video_id}">
+	      <img src=${url} style="width: 210px; max-height: 117.5px "></img>
+	    </a>
+	    <div style="line-height: 1.6rem; font-size: 1.4rem; font-weight: 500">
+	      <div style="margin-top: 10px; color: black"> ${title}</div>
+	    </div>
+	    <div style="line-height: 1.8rem; font-size: 1.3rem">
+	      <a href=${author_link} style="text-decoration: none;">
+	        <div style="margin-top: 8px; color: #6E6E6E"> ${author}</div>
+	      </a>
+	      <a href=${url} style="text-decoration: none;">
+	        <div style="color: ${text_style}">Bleep: ${prompt_text} content</div>
+	      </a>
+	    </div>
+	  </div>
+	  `;
+	  };
+
+	  var title = `
+	  <div style="font-size: 1.6rem; font-weight: 500; line-height: 2rem; max-height: 2rem;">
+	    Evaluated by Bleep
+	  </div>
+	  `;
+
+		data.forEach(({ sentiment, metadata, id }) => {
+				var total = 0;
+				for(let i = 0; i < sentiment.length; i++){
+					console.log(sentiment[i].score);
+					total += sentiment[i].score;
+				}
+				let score = total / sentiment.length;
+				thumbnailContainer.append(create_thumbnail(id, metadata.title, metadata.publishers, score));
+
+		});
+
+		// for (let vid of data) {
+		// 	console.log('VID', vid.sentiment)
+		// 	let score = vid.sentiment.reduce((a, b) => {
+		// 		return a + b;
+		// 	}) / vid.sentiment.length;
+		// 	console.log('SCORE', score)
+		// 	thumbnailContainer.append(create_thumbnail(getJsonFromUrl(vid.metadata.publisher_link).v, vid.metadata.title, vid.metadata.publishers, score));
+		// }
+
+	  titleContainer.append(title);
+	  overallContainer.append(titleContainer);
+	  overallContainer.append(thumbnailContainer);
+
+	  new_div = $("#contents").prepend(overallContainer);
+	})
+	.catch(e => console.log('e', e))
+};
+
 
 chrome.extension.sendMessage({}, response => {
 	let check = setInterval(() => {
 		video = document.getElementsByClassName('video-stream')[0];
+		title = document.getElementsByClassName('title')[0];
+		name = document.getElementById('owner-name');
+		link = document.getElementById('owner-name');
 		if (video) {
 			video.pause();
+		}
+		if (title && name && link.childNodes[0]) {
+			let url = `https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}&title=${title.textContent}&publisher=${name.textContent}&publisher_link=${link.childNodes[0].href}`;
+			console.log('URL', url)
+
+			fetch(url)
+			.then(res => res.json())
+			.then(({ transcript: transcriptData, sentiment, metadata }) => {
+				console.log('SENTIMENT', sentiment)
+				transcript = transcriptData.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
+				let gradient = document.createElement('div');
+
+				Object.assign(gradient.style,{
+					// position: 'relative',
+					display: 'flex',
+					bottom: '0',
+					justifySelf: 'flex-end',
+					height: '5px',
+					width: '100%',
+					backgroundColor: 'white',
+					backgroundImage: `linear-gradient(90deg, ${sentiment.map((_, i) => `${interpolateColors([0,255,0], [255,0,0], _.score)} ${~~(i / (sentiment.length - 1) * 100)}%`).join(', ')})`
+					// backgroundImage: 'linear-gradient(90deg, rgb(0, 0, 0) 0%, #6284FF 50%, #FF0000 100%)'
+				});
+
+				let check2 = setInterval(() => {
+					container = document.getElementById('player-container');
+					if (container) {
+						container.appendChild(gradient);
+						console.log('CONTAINER', container)
+						clearInterval(check2);
+					}
+				}, 100);
+				video.play();
+			})
+			.catch(e => console.log('e', e));
+
 			clearInterval(check);
 		}
 	}, 100);
-
-  // metadata collection here
-  let title = document.getElementsByClassName('title')[0].textContent;
-  let name = document.getElementById('owner-name').textContent;
-  let link = document.getElementById('owner-name').childNodes[0].href;
-  //select stuff here
-
-	fetch(`https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}&title=${title}&publisher=${name}&publisher_link=${link}`)
-  .then(res => res.json())
-  .then(d => {
-    transcript = d.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
-		let gradient = document.createElement('div');
-
-		Object.assign(gradient.style,{
-			// position: 'relative',
-			display: 'flex',
-			bottom: '0',
-			justifySelf: 'flex-end',
-			height: '5px',
-			width: '100%',
-			backgroundColor: 'white',
-			backgroundImage: `linear-gradient(90deg, ${[...Array(50)].map((_, i) => `${interpolateColors([0,255,0], [255,0,0], Math.random())} ${~~(i / 49 * 100)}%`).join(', ')})`
-			// backgroundImage: 'linear-gradient(90deg, rgb(0, 0, 0) 0%, #6284FF 50%, #FF0000 100%)'
-		});
-
-		let check2 = setInterval(() => {
-			container = document.getElementById('player-container');
-			if (container) {
-				container.appendChild(gradient);
-				console.log('CONTAINER', container)
-				clearInterval(check2);
-			}
-		}, 100);
-		video.play();
-  })
-  .catch(e => console.log('e', e));
 
 	let readyStateCheckInterval = setInterval(() => {
 		if (activeIndex !== 0 && video && document.readyState === "complete") {
@@ -144,9 +242,9 @@ function playNote(frequency, duration) {
 	setTimeout(() => oscillator.stop(), duration);
 }
 
-chrome.storage.sync.get('settings', ({ settings }) => {
+chrome.storage.sync.get('settings', ({ settings = { activeIndex: 0, custom: '' } }) => {
 	activeIndex = Number(settings.activeIndex);
-	customText = settings.custom.split(', ');
+	customText = (settings.custom).split(', ');
 });
 
 function interpolateColors(color1, color2, progress) { // color is [r, g, b], progress is 0 - 1
