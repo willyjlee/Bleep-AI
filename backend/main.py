@@ -57,8 +57,8 @@ def path():
     publisher = request.args.get('publisher')
     publisher_link = request.args.get('publisher_link')
     metadata = {
-        "title": title
-        "publisher": publisher
+        "title": title,
+        "publisher": publisher,
         "publisher_link": publisher_link
     }
 
@@ -66,9 +66,9 @@ def path():
         print('db has entry')
         results = db.fetch(video_id)
         return jsonify({
-            "transcript": results[transcript],
-            "sentiment": results[sentiment_data],
-            "metadata": results[metadata]
+            "transcript": results["transcript"],
+            "sentiment": results["sentiment"],
+            "metadata": results["metadata"]
         })
     print('db does not have entry')
     download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
