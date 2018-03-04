@@ -1,1 +1,0 @@
-blob_account_key = 'FzWaUJQzKoca7OO1p/BXiAs+JdEC75HybSKJrVfi/UEzXsHXv4mMNKfHUdEOHfHWF0GB0YIsKLlzi2SadMAesg=='

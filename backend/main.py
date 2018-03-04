@@ -43,7 +43,7 @@ def callback():
 def download():
     video_id = request.args.get('video_id')
     print(video_id)
-    download_handler.download('https://www.youtube.com/watch?v=' + video_id)
+    download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
     return "installed that shit"
 
 
@@ -51,7 +51,7 @@ def download():
 def path():
     video_id = request.args.get('id')
     print(video_id)
-    processVideo(os.path.join('videos', 'video.mp4'))
+    processVideo(os.path.join('videos', 'video.mp4'), os.path.join('resources', 'data', 'transcript.info'))
     return jsonify(parser.parse())
 
 

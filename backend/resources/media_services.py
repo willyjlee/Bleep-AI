@@ -7,6 +7,8 @@ from time import sleep
 #from parse import Parser
 import os
 
+blob_account_key = 'FzWaUJQzKoca7OO1p/BXiAs+JdEC75HybSKJrVfi/UEzXsHXv4mMNKfHUdEOHfHWF0GB0YIsKLlzi2SadMAesg=='
+
 # returns token
 def getADToken():
     url = "https://login.microsoftonline.com/octabytes.onmicrosoft.com/oauth2/token"
@@ -135,17 +137,17 @@ def getOutput(outputUrl, token):
     response = requests.request("GET", outputUrl, headers=headers)
     return response.json()["value"][0]["Id"]
 
-def download(container):
+def download(container, filepath):
     block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
     gen = block_blob_service.list_blobs(container)
     blob_name = None
     for blob in gen:
         if blob.name.endswith('.info'):
             blob_name = blob.name
-    block_blob_service.get_blob_to_path(container, blob_name, os.path.join('data', 'transcript.info'))
+    block_blob_service.get_blob_to_path(container, blob_name, filepath)
     print('...downloaded transcript.info')
 
-def processVideo(videoPath):
+def processVideo(videoPath, transPath):
     token = getADToken()
     assetId = createAsset(token, "iamconfused")
     uploadUrl = createSASLocator(token, assetId)
@@ -160,5 +162,5 @@ def processVideo(videoPath):
         state = getJobState(token, jobId)
 
     outputAssetId = getOutput(outputUrl, token)
-    download('asset-' + outputAssetId[12:])
+    download('asset-' + outputAssetId[12:], transPath)
 
