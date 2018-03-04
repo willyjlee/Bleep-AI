@@ -6,6 +6,7 @@ class DatabaseHandler(object):
         self.database.insert_one({ "id": video_id, "transcript": transcript })
 
     def exists(self, video_id):
+        print(self.database.find_one({ "id": video_id }))
         return self.database.find_one({ "id": video_id }) is not None
 
     def fetch(self, video_id):

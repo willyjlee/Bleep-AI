@@ -54,7 +54,7 @@ def path():
 
     if db.exists(video_id):
         print('db has entry')
-        return db.fetch(video_id)['transcript']
+        return jsonify(db.fetch(video_id)['transcript'])
     print('db does not have entry')
     download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
 	
