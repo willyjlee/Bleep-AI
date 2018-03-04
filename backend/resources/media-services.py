@@ -99,6 +99,25 @@ def startIndexingJob(token, assetId):
     response = requests.request("POST", url, data=payload, headers=headers)
     return response.json()["d"]["Id"]
 
+def getJobState(jobId):
+    url = "https://wordsplitter.restv2.centralus.media.azure.net/api//Jobs('%s')" % jobId
+
+    querystring = {"$select":"State"}
+
+    headers = {
+        'x-ms-version': "2.15",
+        'Accept': "application/json",
+        'Content-Type': "application/json",
+        'DataServiceVersion': "3.0",
+        'MaxDataServiceVersion': "3.0",
+        'User-Agent': "azure media services postman collection",
+        'Cache-Control': "no-cache",
+        'Postman-Token': "11e6586d-148e-755e-42ae-875850d48382"
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
+    return response.json()["State"]
 
 
 def processVideo(videoPath):
@@ -110,4 +129,3 @@ def processVideo(videoPath):
     addMetadata(assetId)
     jobId = startIndexingJob(token, assetId)
     print(jobId)
-
