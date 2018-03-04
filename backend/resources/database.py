@@ -13,4 +13,4 @@ class DatabaseHandler(object):
         return self.database.find_one({ "id": video_id })
 
     def fetch_entries(self, num_entries):
-        return [{"sentiment": x["sentiment"], "metadata": x["metadata"]} for x in self.database.find().limit(num_entries)]
+        return [{"id": x["id"], "sentiment": x["sentiment"], "metadata": x["metadata"]} for x in self.database.find().limit(num_entries)]
