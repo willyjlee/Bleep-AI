@@ -26,7 +26,8 @@ window.onload = function() {
 	  });
 	  overallContainer.css({
 	    display: "flex",
-	    "flex-direction": "column"
+	    "flex-direction": "column",
+			"margin-top": "15px"
 	  });
 
 	  var thumbnailContainer = $("<div>", {
@@ -48,8 +49,9 @@ window.onload = function() {
 	  var create_thumbnail = (video_id = "", title = "", author = "", author_link="google.com", rating=0) => {
 	    url =
 	      "https://i.ytimg.com/vi/" + video_id + "/hqdefault.jpg?sqp=-oaymwEZCNACELwBSFXyq4qpAwsIARUAAIhCGAFwAQ==&rs=AOn4CLDH4jTHLG0t3N64dLBsBfQncpS_Rw"
-	    text_style = (rating < 0.5)? "red": "green";
-	    prompt_text = (rating > 0.5)? "Safe": "Explicit";
+	    text_style = (rating < 0.55)? "red": "green";
+	    prompt_text = (rating < 0.55)? "Explicit": "Safe";
+			console.log(author);
 	    return `
 	  <div style="width: 210px; height: auto; margin-right: 4px; display: flex; flex-direction: column">
 	    <a href="http://youtube.com/watch?v=${video_id}">
@@ -82,7 +84,8 @@ window.onload = function() {
 					total += sentiment[i].score;
 				}
 				let score = total / sentiment.length;
-				thumbnailContainer.append(create_thumbnail(id, metadata.title, metadata.publishers, score));
+				console.log(score);
+				thumbnailContainer.append(create_thumbnail(id, metadata.title, metadata.publishers, metadata.publisher_link, score));
 
 		});
 
