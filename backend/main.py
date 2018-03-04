@@ -51,10 +51,18 @@ def download():
 def path():
     video_id = request.args.get('id')
     print(video_id)
+
+    if db.exists(video_id):
+        print('db has entry')
+        return db.fetch(video_id)['transcript']
+    print('db does not have entry')
     download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
+	
     processVideo(os.path.join('videos', 'video.mp4'), os.path.join('resources', 'data', 'transcript.info'))
     parser = Parser()
-    return jsonify(parser.parse(os.path.join('resources', 'data'), 'transcript.info'))
+    data = parser.parse(os.path.join('resources', 'data'), 'transcript.info')
+    db.push(video_id, data)
+    return jsonify(data)
 
 
 @app.route('/database')
