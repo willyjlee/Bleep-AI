@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from resources.download import VideoDownloader
 from resources.parse import Parser
 from pymongo import MongoClient
@@ -8,6 +9,7 @@ import json
 import requests
 
 app = Flask(__name__)
+CORS(app)
 download_handler = VideoDownloader()
 parser = Parser()
 
@@ -62,5 +64,5 @@ def get_root_path(internal_path=""):
     return os.path.join(app.root_path, internal_path)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080, ssl_context=('cert.pem', 'key.pem'))
 
