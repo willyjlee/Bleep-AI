@@ -53,6 +53,7 @@ def path():
     print(video_id)
     download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
     processVideo(os.path.join('videos', 'video.mp4'), os.path.join('resources', 'data', 'transcript.info'))
+    parser = Parser()
     return jsonify(parser.parse(os.path.join('resources', 'data'), 'transcript.info'))
 
 
