@@ -1,4 +1,4 @@
-let transcript = [];
+let transcript = fake.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
 let paused = false;
 let previousTime = 0;
 let customText = [];
@@ -12,31 +12,27 @@ let synth = new Tone.Oscillator({
 
 
 chrome.extension.sendMessage({}, response => {
-	fetch('https://52.165.191.240:8080/path?id=chicken', {
-        method: 'GET',
-    })
-    .then(res => res.json())
-    .then(d => {
-      transcript = d.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
-    })
-    .catch(e => console.log('e', e));
+	// fetch(`https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}`)
+  // .then(res => res.json())
+  // .then(d => {
+  //   transcript = d.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
+  // })
+  // .catch(e => console.log('e', e));
 
 	let readyStateCheckInterval = setInterval(() => {
-		if (document.readyState === "complete") {
+		let video = document.getElementsByClassName('video-stream')[0];
+		video && video.pause();
+		if (activeIndex !== 0 && document.readyState === "complete") {
 			clearInterval(readyStateCheckInterval);
-			let video = document.getElementsByClassName('video-stream')[0];
-			// video.addEventListener('timeupdate', () => {
-			// 	console.log(video.currentTime)
-			// })
-
+			video.play();
 			setInterval(() => {
 				let { currentTime } = video;
 				if (!paused) {
 					let data = getWord(currentTime, transcript);
 					if (data && lastData != data) {
 						let { word, start, end } = data;
-						console.log('WORD', word)
-						if (word.length > 1 && word.includes('*')) {
+						console.log(word, activeIndex === 3 && customText.includes(word))
+						if ((activeIndex === 3 && customText.includes(word)) || (activeIndex === 1 && word.length > 1 && word.includes('*')) || (activeIndex === 2 && !word.includes('*'))) {
 							synth.start();
 							video.volume = 0;
 		        } else {
@@ -113,8 +109,7 @@ function playNote(frequency, duration) {
 	setTimeout(() => oscillator.stop(), duration);
 }
 
-chrome.storage.sync.get('settings', (f) => {
-	console.log('SETTINGS', f);
-	// customText = settings.custom.split(', ');
-	// console.log('CUSTOMTEXT', customText)
+chrome.storage.sync.get('settings', ({ settings }) => {
+	activeIndex = Number(settings.activeIndex);
+	customText = settings.custom.split(', ');
 });

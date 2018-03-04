@@ -23,7 +23,7 @@ for (let index in rows) {
         custom.focus();
       }
       row.classList.add('active');
-      chrome.storage.sync.set({ settings: { activeIndex: index }});
+      chrome.storage.sync.set({ settings: { activeIndex: index, custom: custom.value }});
     });
   }
 }
