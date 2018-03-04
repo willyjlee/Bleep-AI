@@ -92,7 +92,8 @@ def startIndexingJob(token, assetId):
     }
 
     response = requests.request("POST", url, data=payload, headers=headers)
-    return response.json()["d"]["Id"]
+    js = response.json()
+    return js["d"]["Id"], js["d"]["OutputMediaAssets"]["__deferred"]["uri"]
 
 
 def getJobState(token, jobId):
@@ -117,18 +118,46 @@ def getJobState(token, jobId):
         return -1
     return response.json()["State"]
 
+def getOutput(outputUrl, token):
+    headers = {
+        'x-ms-version': "2.15",
+        'Accept': "application/json",
+        'Content-Type': "application/json",
+        'DataServiceVersion': "3.0",
+        'MaxDataServiceVersion': "3.0",
+        'User-Agent': "azure media services postman collection",
+        'Authorization': "Bearer %s" % token,
+        'Cache-Control': "no-cache",
+        'Postman-Token': "867114be-9e9a-5c0b-2209-5e405093abcf"
+    }
+    response = requests.request("GET", outputUrl, headers=headers)
+    return response.json()["value"][0]["Id"]
+
+def download(container):
+    block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
+    gen = block_blob_service.list_blobs(container)
+    blob_name = None
+    for blob in gen:
+        if blob.name.endswith('.info'):
+            blob_name = blob.name
+    block_blob_service.get_blob_to_path(container, blob_name, 'transcript.info')
+    print('...downloaded transcript.info')
+
 def processVideo(videoPath):
     token = getADToken()
     assetId = createAsset(token, "iamconfused")
     uploadUrl = createSASLocator(token, assetId)
     uploadInputFile(assetId, uploadUrl, videoPath)
     addMetadata(token, assetId)
-    jobId = startIndexingJob(token, assetId)
+    jobId, outputUrl = startIndexingJob(token, assetId)
 
     state = getJobState(token, jobId)
     while state != 3:
         print('waiting state: %d' % state)
         sleep(1)
         state = getJobState(token, jobId)
+
+    outputAssetId = getOutput(outputUrl, token)
+    download('asset-' + outputAssetId[12:])
 
 processVideo('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4')
