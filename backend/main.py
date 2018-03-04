@@ -90,7 +90,7 @@ def database():
 
 @app.route('/fetch_entries')
 def fetch_entries():
-    return jsonify({"returned": db.fetch_entries(num_entries=5)})
+    return jsonify(db.fetch_entries(num_entries=5))
 
 def get_root_path(internal_path=""):
     return os.path.join(app.root_path, internal_path)
