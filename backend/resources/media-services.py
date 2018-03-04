@@ -4,6 +4,8 @@ from azure.storage.blob import ContentSettings
 from azure.storage.blob import PublicAccess
 from variables import blob_account_key
 from time import sleep
+from parse import Parser
+import os
 
 # returns token
 def getADToken():
@@ -140,7 +142,7 @@ def download(container):
     for blob in gen:
         if blob.name.endswith('.info'):
             blob_name = blob.name
-    block_blob_service.get_blob_to_path(container, blob_name, 'transcript.info')
+    block_blob_service.get_blob_to_path(container, blob_name, os.path.join('data', 'transcript.info'))
     print('...downloaded transcript.info')
 
 def processVideo(videoPath):
@@ -159,5 +161,9 @@ def processVideo(videoPath):
 
     outputAssetId = getOutput(outputUrl, token)
     download('asset-' + outputAssetId[12:])
+    parse = Parser()
+    data = parse.parse('data', 'transcript.info')
+    print(data)
+
 
 processVideo('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4')
