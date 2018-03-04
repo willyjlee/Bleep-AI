@@ -11,3 +11,6 @@ class DatabaseHandler(object):
 
     def fetch(self, video_id):
         return self.database.find_one({ "id": video_id })
+
+    def fetch_entries(self, num_entries):
+        return list(self.database.find().limit(num_entries))
