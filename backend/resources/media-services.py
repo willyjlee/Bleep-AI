@@ -3,6 +3,7 @@ from azure.storage.blob import BlockBlobService
 from azure.storage.blob import ContentSettings
 from azure.storage.blob import PublicAccess
 from variables import blob_account_key
+import time
 
 blob_name = 'blobby.mp4'
 
@@ -60,7 +61,7 @@ def createSASLocator(token, assetId):
 
 def uploadInputFile(uploadUrl, filepath):
     block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
-    block_blob_service.create_blob_from_path('asset-d63d7b5a-9d33-4ff2-b8b7-9153ec48e0fd', blob_name, filepath, content_settings=ContentSettings(content_type='video/mp4'))
+    block_blob_service.create_blob_from_path('asset-01710092-f9e9-4be3-98ce-a15eebe8b42b', blob_name, filepath, content_settings=ContentSettings(content_type='video/mp4'))
 
 def addMetadata(assetId):
     url = "https://wordsplitter.restv2.centralus.media.azure.net/api/CreateFileInfos"
@@ -128,4 +129,12 @@ def processVideo(videoPath):
     uploadInputFile(uploadUrl, videoPath)
     addMetadata(assetId)
     jobId = startIndexingJob(token, assetId)
+
+    state = getJobState(jobId)
+    while state != 3:
+        print('waiting state: %d' % state)
+        time.sleep(5)
+        state = getJobState(jobId)
     print(jobId)
+
+processVideo('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4')
