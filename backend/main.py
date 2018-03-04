@@ -38,19 +38,20 @@ def callback():
 	print(breakds.text)
 	return "ok..."
 
-
+'''
 @app.route('/download')
 def download():
     video_id = request.args.get('video_id')
     print(video_id)
     download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
     return "installed that shit"
-
+'''
 
 @app.route('/path')
 def path():
     video_id = request.args.get('id')
     print(video_id)
+    download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
     processVideo(os.path.join('videos', 'video.mp4'), os.path.join('resources', 'data', 'transcript.info'))
     return jsonify(parser.parse(os.path.join('resources', 'data'), 'transcript.info'))
 
