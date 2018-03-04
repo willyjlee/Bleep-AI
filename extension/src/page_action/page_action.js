@@ -5,10 +5,7 @@ let radios = document.getElementsByClassName('radio');
 let rows = document.getElementsByClassName('row');
 
 custom.addEventListener('keyup', () => {
-  resetActive();
-  rows[3].classList.add('active');
-  let words = custom.value.split(',').map(t => t.trim())
-  console.log(words);
+  chrome.storage.sync.set({ settings: { activeIndex: 3, custom: custom.value.split(',').map(t => t.trim()).join(', ') } });
 })
 
 egg.addEventListener('click', () => {
@@ -17,15 +14,16 @@ egg.addEventListener('click', () => {
   easter.style.overflow = '';
 });
 
-for (let index in radios) {
-  let radio = radios[index];
-  if (radio.addEventListener) {
-    radio.addEventListener('click', () => {
+for (let index in rows) {
+  let row = rows[index];
+  if (row.addEventListener) {
+    row.addEventListener('click', () => {
       resetActive();
       if (index === 3) {
         custom.focus();
       }
-      rows[index].classList.add('active');
+      row.classList.add('active');
+      chrome.storage.sync.set({ settings: { activeIndex: index }});
     });
   }
 }
@@ -37,7 +35,8 @@ function resetActive() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // chrome.storage.sync.get('activeIndex', data => {
-    console.log(chrome.storage);
-  // });
+  chrome.storage.sync.get('settings', ({ settings }) => {
+    rows[settings.activeIndex || 0].classList.add('active');
+    custom.value = settings.custom;
+  });
 });
