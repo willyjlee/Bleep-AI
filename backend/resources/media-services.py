@@ -3,8 +3,7 @@ from azure.storage.blob import BlockBlobService
 from azure.storage.blob import ContentSettings
 from azure.storage.blob import PublicAccess
 from variables import blob_account_key
-
-blob_name = 'blobby.mp4'
+from time import sleep
 
 # returns token
 def getADToken():
@@ -58,15 +57,13 @@ def createSASLocator(token, assetId):
 
     return response.json()["Path"]
 
-def uploadInputFile(uploadUrl, filepath):
+def uploadInputFile(assetId, uploadUrl, filepath):
     block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
-    block_blob_service.create_blob_from_path('asset-d63d7b5a-9d33-4ff2-b8b7-9153ec48e0fd', blob_name, filepath, content_settings=ContentSettings(content_type='video/mp4'))
+    block_blob_service.create_blob_from_path('asset-' + assetId[12:], 'blobby.mp4', filepath, content_settings=ContentSettings(content_type='video/mp4'))
 
-def addMetadata(assetId):
-    url = "https://wordsplitter.restv2.centralus.media.azure.net/api/CreateFileInfos"
-
-    querystring = {"assetid":"'%s'" % assetId}
-
+def addMetadata(token, assetId):
+    url = "https://wordsplitter.restv2.centralus.media.azure.net/api/CreateFileInfos?assetid='%s'" % assetId
+    print(url)
     headers = {
         'x-ms-version': "2.15",
         'Accept': "application/json",
@@ -74,11 +71,10 @@ def addMetadata(assetId):
         'DataServiceVersion': "3.0",
         'MaxDataServiceVersion': "3.0",
         'User-Agent': "azure media services postman collection",
-        'Cache-Control': "no-cache",
-        'Postman-Token': "131da290-d6eb-c61c-5614-715ac30d2bb3"
+        'Authorization': "Bearer %s" % token,
     }
 
-    requests.request("GET", url, headers=headers, params=querystring)
+    requests.request("GET", url, headers=headers)
 
 # returns Job ID
 def startIndexingJob(token, assetId):
@@ -97,10 +93,12 @@ def startIndexingJob(token, assetId):
     }
 
     response = requests.request("POST", url, data=payload, headers=headers)
+    print(response.json())
     return response.json()["d"]["Id"]
 
+
 def getJobState(jobId):
-    url = "https://wordsplitter.restv2.centralus.media.azure.net/api//Jobs('%s')" % jobId
+    url = "https://wordsplitter.restv2.centralus.media.azure.net/api/Jobs('%s')" % jobId
 
     querystring = {"$select":"State"}
 
@@ -119,13 +117,13 @@ def getJobState(jobId):
 
     return response.json()["State"]
 
-
 def processVideo(videoPath):
     token = getADToken()
-    assetId = createAsset(token, "lolwatchmenow")
-    print(assetId)
+    assetId = createAsset(token, "iamconfused")
     uploadUrl = createSASLocator(token, assetId)
-    uploadInputFile(uploadUrl, videoPath)
-    addMetadata(assetId)
+    uploadInputFile(assetId, uploadUrl, videoPath)
+    addMetadata(token, assetId)
     jobId = startIndexingJob(token, assetId)
     print(jobId)
+
+processVideo('/mnt/c/Users/Tejas/Downloads/BigBuckBunny.mp4')
