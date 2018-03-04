@@ -7,6 +7,7 @@ from bson.objectid import ObjectId
 import os
 import json
 import requests
+from resources.media_services import processVideo
 
 app = Flask(__name__)
 CORS(app)
@@ -42,7 +43,7 @@ def callback():
 def download():
     youtube_path = request.args.get('path')
     print(youtube_path)
-    download_handler.download('https://www.youtube.com/' + youtube_path)
+    download_handler.download('https://www.youtube.com/' + youtube_path, 'videos')
     return "installed that shit"
 
 
@@ -50,6 +51,7 @@ def download():
 def path():
     video_id = request.args.get('id')
     print(video_id)
+    processVideo(os.path.join('videos', 'video.mp4'))
     return jsonify(parser.parse())
 
 

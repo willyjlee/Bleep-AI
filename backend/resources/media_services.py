@@ -2,9 +2,9 @@ import requests
 from azure.storage.blob import BlockBlobService
 from azure.storage.blob import ContentSettings
 from azure.storage.blob import PublicAccess
-from variables import blob_account_key
+#import variables
 from time import sleep
-from parse import Parser
+#from parse import Parser
 import os
 
 # returns token
@@ -161,9 +161,4 @@ def processVideo(videoPath):
 
     outputAssetId = getOutput(outputUrl, token)
     download('asset-' + outputAssetId[12:])
-    parse = Parser()
-    data = parse.parse('data', 'transcript.info')
-    print(data)
 
-
-processVideo('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4')
