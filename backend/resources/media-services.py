@@ -1,4 +1,10 @@
 import requests
+from azure.storage.blob import BlockBlobService
+from azure.storage.blob import ContentSettings
+from azure.storage.blob import PublicAccess
+from variables import blob_account_key
+
+blob_name = 'blobby'
 
 # returns token
 def getADToken():
@@ -58,17 +64,10 @@ def createSASLocator(token, assetId):
 
     return response.json()["Path"]
 
-def uploadInputFile(uploadUrl, fileName, filePath):
-    headers = {
-        'x-ms-blob-type': "BlockBlob",
-        'Cache-Control': "no-cache",
-        'Postman-Token': "780f0000-7a4f-4eba-b4b6-870117e92cdf"
-    }
+def uploadInputFile(uploadUrl, filepath):
+    block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
+    block_blob_service.create_blob_from_path('asset-d63d7b5a-9d33-4ff2-b8b7-9153ec48e0fd', blob_name, filepath, content_settings=ContentSettings(content_type='video/mp4'))
 
-    with open(filePath, 'rb') as f:
-        files = {}
-        files[fileName] = f
-        requests.request("PUT", uploadUrl, files=files, headers=headers)
 
 def addMetadata(assetId):
     url = "https://wordsplitter.restv2.centralus.media.azure.net/api/CreateFileInfos"
@@ -93,6 +92,8 @@ def processVideo(videoPath):
     assetId = createAsset(token, "lolwatchmenow")
     print(assetId)
     uploadUrl = createSASLocator(token, assetId)
-    uploadInputFile(uploadUrl, 'BigBuckBunny.mp4', videoPath)
+    uploadInputFile(uploadUrl, videoPath)
     addMetadata(assetId)
+
+processVideo('/Users/lee/Documents/pprojects/HackTech2018/backend/video.mp4')
 

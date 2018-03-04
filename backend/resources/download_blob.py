@@ -4,16 +4,18 @@ from azure.storage.blob import PublicAccess
 from variables import blob_account_key
 import requests
 
-container_name = 'container0'
-blob_name = 'blob0'
-video_name = 'video.mp4'
+# container_name = 'container0'
+# blob_name = 'blob0'
+# video_name = 'video.mp4'
+container_name = 'asset-d63d7b5a-9d33-4ff2-b8b7-9153ec48e0fd'
+blob_name = 'blobby'
 
 def push(filepath):
 	# upload with blob
-	# block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
+	block_blob_service = BlockBlobService(account_name='wordsplitter', account_key=blob_account_key)
 	# block_blob_service.create_container(container_name, public_access=PublicAccess.Container)
 	# block_blob_service.set_container_acl(container_name, public_access=PublicAccess.Container)
-	# block_blob_service.create_blob_from_path(container_name, blob_name, filepath, content_settings=ContentSettings(content_type='video/mp4'))
+	block_blob_service.create_blob_from_path(container_name, blob_name, filepath, content_settings=ContentSettings(content_type='video/mp4'))
 
 
 	# start job with requests
