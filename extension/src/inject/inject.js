@@ -20,7 +20,6 @@ window.onload = function() {
 	fetch('https://52.165.191.240:8080/fetch_entries')
 	.then(res => res.json())
 	.then(data => {
-		console.log('DATA', data)
 
 		var overallContainer = $("<div>", {
 	    id: "overallContainer"
@@ -80,7 +79,6 @@ window.onload = function() {
 		data.forEach(({ sentiment, metadata, id }) => {
 				var total = 0;
 				for(let i = 0; i < sentiment.length; i++){
-					console.log(sentiment[i].score);
 					total += sentiment[i].score;
 				}
 				let score = total / sentiment.length;
@@ -88,14 +86,7 @@ window.onload = function() {
 
 		});
 
-		// for (let vid of data) {
-		// 	console.log('VID', vid.sentiment)
-		// 	let score = vid.sentiment.reduce((a, b) => {
-		// 		return a + b;
-		// 	}) / vid.sentiment.length;
-		// 	console.log('SCORE', score)
-		// 	thumbnailContainer.append(create_thumbnail(getJsonFromUrl(vid.metadata.publisher_link).v, vid.metadata.title, vid.metadata.publishers, score));
-		// }
+
 
 	  titleContainer.append(title);
 	  overallContainer.append(titleContainer);
@@ -118,12 +109,10 @@ chrome.extension.sendMessage({}, response => {
 		}
 		if (title && name && link.childNodes[0]) {
 			let url = `https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}&title=${title.textContent}&publisher=${name.textContent}&publisher_link=${link.childNodes[0].href}`;
-			console.log('URL', url)
 
 			fetch(url)
 			.then(res => res.json())
 			.then(({ transcript: transcriptData, sentiment, metadata }) => {
-				console.log('SENTIMENT', sentiment)
 				transcript = transcriptData.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));
 				let gradient = document.createElement('div');
 
@@ -132,7 +121,7 @@ chrome.extension.sendMessage({}, response => {
 					display: 'flex',
 					bottom: '0',
 					justifySelf: 'flex-end',
-					height: '5px',
+					height: '9px',
 					width: '100%',
 					backgroundColor: 'white',
 					backgroundImage: `linear-gradient(90deg, ${sentiment.map((_, i) => `${interpolateColors([0,255,0], [255,0,0], _.score)} ${~~(i / (sentiment.length - 1) * 100)}%`).join(', ')})`
@@ -143,7 +132,6 @@ chrome.extension.sendMessage({}, response => {
 					container = document.getElementById('player-container');
 					if (container) {
 						container.appendChild(gradient);
-						console.log('CONTAINER', container)
 						clearInterval(check2);
 					}
 				}, 100);
@@ -164,8 +152,9 @@ chrome.extension.sendMessage({}, response => {
 					let data = getWord(currentTime, transcript);
 					if (data && lastData != data) {
 						let { word, start, end } = data;
-						console.log(word, activeIndex === 3 && customText.includes(word))
-						if ((activeIndex === 3 && customText.includes(word)) || (activeIndex === 1 && word.length > 1 && word.includes('*')) || (activeIndex === 2 && !word.includes('*'))) {
+						word = word.replace('.', '');
+						console.log('WORD', word, activeIndex === 1 && word.length > 1 && word.includes('*') && !word.includes('*'.repeat(word.length)))
+						if ((activeIndex === 3 && customText.includes(word)) || (activeIndex === 1 && word.length > 1 && word.includes('*') && !word.includes('*'.repeat(word.length))) || (activeIndex === 2 && !word.includes('*'))) {
 							synth.start();
 							video.volume = 0;
 		        } else {
