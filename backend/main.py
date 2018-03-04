@@ -52,7 +52,7 @@ def path():
     video_id = request.args.get('id')
     print(video_id)
     processVideo(os.path.join('videos', 'video.mp4'), os.path.join('resources', 'data', 'transcript.info'))
-    return jsonify(parser.parse())
+    return jsonify(parser.parse(os.path.join('resources', 'data'), 'transcript.info'))
 
 
 @app.route('/database')
