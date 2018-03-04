@@ -2,8 +2,8 @@ class DatabaseHandler(object):
     def __init__(self, db):
         self.database = db
 
-    def push(self, video_id, transcript):
-        self.database.insert_one({ "id": video_id, "transcript": transcript })
+    def push(self, video_id, transcript, sentiment, metadata):
+        self.database.insert_one({ "id": video_id, "transcript": transcript, "sentiment": sentiment, "metadata": metadata })
 
     def exists(self, video_id):
         print(self.database.find_one({ "id": video_id }))

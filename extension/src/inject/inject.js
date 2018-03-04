@@ -21,7 +21,13 @@ chrome.extension.sendMessage({}, response => {
 		}
 	}, 100);
 
-	fetch(`https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}`)
+  // metadata collection here
+  let title = document.getElementsByClassName('title')[0].textContent;
+  let name = document.getElementById('owner-name').textContent;
+  let link = document.getElementById('owner-name').childNodes[0].href;
+  //select stuff here
+
+	fetch(`https://52.165.191.240:8080/path?id=${getJsonFromUrl().v}&title=${title}&publisher=${name}&publisher_link=${link}`)
   .then(res => res.json())
   .then(d => {
     transcript = d.map(({ word, start, end }) => ({ word, start: start - 0.2, end: end - 0.2 }));

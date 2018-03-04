@@ -3,6 +3,7 @@ from flask_cors import CORS
 from resources.download import VideoDownloader
 from resources.parse import Parser
 from resources.database import DatabaseHandler
+from resources.sentiment import sentiment_analysis
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
@@ -26,7 +27,6 @@ headers = {
 @app.route('/')
 def hello_world():
     return "Welcome Bitch"
-
 
 @app.route('/callback', methods=['POST'])
 def callback():
@@ -52,17 +52,33 @@ def path():
     video_id = request.args.get('id')
     print(video_id)
 
+    # metadata
+    title = request.args.get('title')
+    publisher = request.args.get('publisher')
+    publisher_link = request.args.get('publisher_link')
+    metadata = {
+        "title": title
+        "publisher": publisher
+        "publisher_link": publisher_link
+    }
+
     if db.exists(video_id):
         print('db has entry')
-        return jsonify(db.fetch(video_id)['transcript'])
+        results = db.fetch(video_id)
+        return jsonify({
+            "transcript": results[transcript],
+            "sentiment": results[sentiment_data],
+            "metadata": results[metadata]
+        })
     print('db does not have entry')
     download_handler.download('https://www.youtube.com/watch?v=' + video_id, 'videos')
-	
+
     processVideo(os.path.join('videos', 'video.mp4'), os.path.join('resources', 'data', 'transcript.info'))
     parser = Parser()
-    data = parser.parse(os.path.join('resources', 'data'), 'transcript.info')
-    db.push(video_id, data)
-    return jsonify(data)
+    transcript = parser.parse(os.path.join('resources', 'data'), 'transcript.info')
+    sentiment_data = sentiment_analysis(transcript)
+    db.push(video_id, transcript, sentiment_data, metadata)
+    return jsonify({ "transcript": transcript, "sentiment": sentiment_data, "metadata": metadata })
 
 
 @app.route('/database')
