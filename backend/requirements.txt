@@ -93,7 +93,7 @@ msrest==0.4.26
 msrestazure==0.4.22
 oauthlib==2.0.6
 pycparser==2.18
-PyJWT==1.6.0
+PyJWT==2.4.0
 pymongo==3.6.1
 pyOpenSSL==17.5.0
 python-dateutil==2.6.1
